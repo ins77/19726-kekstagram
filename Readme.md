@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url] [![Dependency status][dependency-image]][dependency-url]
 
 * Студент: [Дмитрий Сухинин](https://up.htmlacademy.ru/javascript/5/user/19726).
-* Наставник: `Неизвестно`.
+* Наставник: `Сам по себе :(`.
 
 ---
 
