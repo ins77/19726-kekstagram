@@ -1,16 +1,15 @@
 var getMessage = function(a, b) {
   var msg;
 
-  if (typeof(a) == "boolean") {
+  if (typeof a == "boolean") {
 
     if (a) {
       msg = "Переданное GIF-изображение анимировано и содержит " + b + " кадров";
-
     } else {
       msg = "Переданное GIF-изображение не анимировано";
     }
 
-  } else if (typeof(a) == "number") {
+  } else if (typeof a == "number") {
 
     msg = "Переданное SVG-изображение содержит " + a + " объектов и " + (b * 4) + " атрибутов";
 
