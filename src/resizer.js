@@ -123,26 +123,25 @@
       // Отрисовка прямоугольника с дыркой внутри
       this._ctx.beginPath();
       this._ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-      this._ctx.lineTo(this._container.width, -this._container.height / 2);
-      this._ctx.lineTo(this._container.width, this._container.height);
-      this._ctx.lineTo(-this._container.width / 2, this._container.height);
-      this._ctx.lineTo(
-        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth,
-        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth);
-      this._ctx.lineTo(
-        (this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2,
-        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth);
-      this._ctx.lineTo(
-        (this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2,
-        (this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2);
-      this._ctx.lineTo(
-        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth,
-        (this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2);
-      this._ctx.lineTo(
-        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth,
-        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth);
-      this._ctx.lineTo(-this._container.width / 2, this._container.height);
+      this._ctx.moveTo(-this._container.width / 2, -this._container.height / 2);
+      this._ctx.lineTo(this._container.width / 2, -this._container.height / 2);
+      this._ctx.lineTo(this._container.width / 2, this._container.height / 2);
+      this._ctx.lineTo(-this._container.width / 2, this._container.height / 2);
       this._ctx.lineTo(-this._container.width / 2, -this._container.height / 2);
+      this._ctx.moveTo(
+        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth, (-this._resizeConstraint.side / 2) - this._ctx.lineWidth);
+      this._ctx.lineTo(
+        (this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2,
+        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth);
+      this._ctx.lineTo(
+        (this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2,
+        (this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2);
+      this._ctx.lineTo(
+        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth,
+        (this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2);
+      this._ctx.lineTo(
+        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth,
+        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth);
       this._ctx.fill('evenodd');
 
       // вывод текста с размерами изображения
