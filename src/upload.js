@@ -72,6 +72,23 @@
    * @return {boolean}
    */
   function resizeFormIsValid() {
+    var valX = parseInt(resizeX.value, 10) || 0;
+    var valY = parseInt(resizeY.value, 10) || 0;
+    var valSize = parseInt(resizeSize.value, 10) || 0;
+
+    resizeX.setCustomValidity('');
+
+    if (valX + valSize > currentResizer._image.naturalWidth) {
+      resizeX.setCustomValidity('Сумма значений полей Слева и Сторона должна быть меньше ширины картинки');
+      return false;
+    } else if (valY + valSize > currentResizer._image.naturalHeight) {
+      resizeX.setCustomValidity('Сумма значений полей Сверху и Сторона должна быть меньше высоты картинки');
+      return false;
+    } else if (valX < 0 || valY < 0 || valSize < 0) {
+      resizeX.setCustomValidity('Значения в полях должны быть больше нуля');
+      return false;
+    }
+
     return true;
   }
 
@@ -86,6 +103,15 @@
    * @type {HTMLFormElement}
    */
   var resizeForm = document.forms['upload-resize'];
+
+  var resizeX = resizeForm['resize-x'];
+  var resizeY = resizeForm['resize-y'];
+  var resizeSize = resizeForm['resize-size'];
+  var resizeFwd = resizeForm['resize-fwd'];
+
+  resizeX.min = 0;
+  resizeY.min = 0;
+  resizeSize.min = 0;
 
   /**
    * Форма добавления фильтра.
@@ -168,6 +194,31 @@
         // поддерживаемым изображением.
         showMessage(Action.ERROR);
       }
+    }
+  };
+
+  /**
+   * Обработка ввода данных формы кадрирования.
+   * @param {Event} evt
+   */
+  resizeForm.oninput = function(evt) {
+    evt.preventDefault();
+
+    var elemAlert = document.createElement('div');
+    elemAlert.classList.add('upload-form-alert');
+    var alert = resizeForm.querySelector('.upload-form-alert');
+    if (alert !== null) {
+      resizeForm.removeChild(alert);
+    }
+
+    if (resizeFormIsValid()) {
+      resizeFwd.style.opacity = 1;
+      resizeFwd.disabled = false;
+    } else {
+      resizeFwd.style.opacity = 0.1;
+      resizeFwd.disabled = true;
+      elemAlert.innerHTML = resizeX.validationMessage;
+      resizeForm.appendChild(elemAlert);
     }
   };
 
