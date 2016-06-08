@@ -7,6 +7,8 @@
 
 'use strict';
 
+var browserCookies = require('browser-cookies');
+
 (function() {
   /** @enum {string} */
   var FileType = {
@@ -112,6 +114,10 @@
   resizeX.min = 0;
   resizeY.min = 0;
   resizeSize.min = 0;
+
+  resizeX.value = resizeX.min;
+  resizeY.value = resizeY.min;
+  resizeSize.value = resizeSize.min;
 
   /**
    * Форма добавления фильтра.
@@ -265,12 +271,48 @@
   };
 
   /**
+   * Устанавливает начальные значения формы фильтра из кук
+   */
+  function setFilterCookie() {
+    if (browserCookies.get('filter')) {
+      var filterDefault = browserCookies.get('filter');
+      var filterControls = filterForm.querySelectorAll('[name="upload-filter"]');
+      for (var i = 0; i < filterControls.length; i++) {
+        if (filterControls[i].value === filterDefault) {
+          filterControls[i].setAttribute('checked', '');
+          filterImage.classList.add('filter-' + filterDefault);
+        } else {
+          filterControls[i].removeAttribute('checked');
+        }
+      }
+    }
+  }
+
+  setFilterCookie();
+
+  function calculateDateToExpire() {
+    var dateNow = new Date();
+    var dateBirthday = new Date(dateNow.getFullYear(), 5, 9);
+    if (dateBirthday.getMonth() >= dateNow.getMonth() && dateBirthday.getDate() > dateNow.getDate()) {
+      dateBirthday.setFullYear(dateNow.getFullYear() - 1);
+    }
+    var daysToExpire = Date.now() + (dateNow - dateBirthday);
+    var formattedDateToExpire = new Date(daysToExpire).toUTCString();
+
+    return formattedDateToExpire;
+  }
+
+  /**
    * Отправка формы фильтра. Возвращает в начальное состояние, предварительно
    * записав сохраненный фильтр в cookie.
    * @param {Event} evt
    */
   filterForm.onsubmit = function(evt) {
     evt.preventDefault();
+
+    var selectedFilter = filterForm.querySelectorAll('[name="upload-filter"]:checked')[0].value;
+
+    browserCookies.set('filter', selectedFilter, {expires: calculateDateToExpire()});
 
     cleanupResizer();
     updateBackground();
