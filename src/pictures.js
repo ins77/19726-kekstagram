@@ -165,7 +165,7 @@
   };
 
   var addPictures = function() {
-    while (picturesContainer.offsetHeight < window.innerHeight && isNextPageAvailable(pictures, pageNumber, PAGE_SIZE)) {
+    while (isBottomReached() && isNextPageAvailable(pictures, pageNumber, PAGE_SIZE)) {
       renderPictures(filteredPictures, ++pageNumber, false);
     }
   };
@@ -202,7 +202,7 @@
   };
 
   var isBottomReached = function() {
-    var GAP = 200;
+    var GAP = 100;
     var bodyPosition = document.body.getBoundingClientRect();
     return bodyPosition.bottom - window.innerHeight - GAP <= 0;
   };
