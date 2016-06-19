@@ -12,8 +12,17 @@
   /** @constant {string} */
   var PICTURES_LOAD_URL = '//o0.github.io/assets/json/pictures.json';
 
+  /** @constant {number} */
+  var PAGE_SIZE = 12;
+
+  /** @type {number} */
+  var pageNumber = 0;
+
   /** @type {Array.<Object>} */
   var pictures = [];
+
+  /** @type {Array.<Object>} */
+  var filteredPictures = [];
 
   /** @enum {number} */
   var Filter = {
@@ -24,6 +33,16 @@
 
   /** @constant {Filter} */
   var DEFAULT_FILTER = Filter.POPULAR;
+
+  var throttle = function(callback, delay) {
+    var lastCall = Date.now();
+    return function() {
+      if (Date.now() - lastCall >= delay) {
+        callback();
+        lastCall = Date.now();
+      }
+    };
+  };
 
   /**
    * @param {Object} data
@@ -66,7 +85,7 @@
     var xhr = new XMLHttpRequest();
     xhr.timeout = 10000;
 
-    xhr.onloadstart = function() {
+    xhr.onprogress = function() {
       picturesContainer.classList.add('pictures-loading');
     };
 
@@ -90,10 +109,15 @@
     xhr.send();
   };
 
-  var renderPictures = function(loadedPictures) {
-    picturesContainer.innerHTML = '';
+  var renderPictures = function(loadedPictures, page, replace) {
+    if (replace) {
+      picturesContainer.innerHTML = '';
+    }
 
-    loadedPictures.forEach(function(picture) {
+    var from = page * PAGE_SIZE;
+    var to = from + PAGE_SIZE;
+
+    loadedPictures.slice(from, to).forEach(function(picture) {
       getPictureElement(picture, picturesContainer);
     });
   };
@@ -140,9 +164,26 @@
     return picturesToFilter;
   };
 
+  var addPictures = function() {
+    while (picturesContainer.offsetHeight < window.innerHeight && isNextPageAvailable(pictures, pageNumber, PAGE_SIZE)) {
+      renderPictures(filteredPictures, ++pageNumber, false);
+    }
+  };
+
+  var setResize = function() {
+    window.addEventListener('resize', function() {
+      addPictures();
+    });
+  };
+
+  setResize();
+
   var setFilterEnabled = function(filter) {
-    var filteredPictures = getFilteredPictures(pictures, filter);
-    renderPictures(filteredPictures);
+    filteredPictures = getFilteredPictures(pictures, filter);
+    pageNumber = 0;
+    renderPictures(filteredPictures, pageNumber, true);
+
+    addPictures();
 
     var activeFilter = filtersContainer.querySelector(':checked');
     if (activeFilter) {
@@ -152,19 +193,40 @@
     filterToActivate.checked = true;
   };
 
-  var setFiltersEnabled = function(enabled) {
-    var filters = filtersContainer.querySelectorAll('.filters-radio');
-    for (var i = 0; i < filters.length; i++) {
-      filters[i].onclick = enabled ? function() {
-        setFilterEnabled(this.id);
-      } : null;
+  var setFiltersEnabled = function() {
+    filtersContainer.addEventListener('click', function(evt) {
+      if (evt.target.classList.contains('filters-radio')) {
+        setFilterEnabled(evt.target.id);
+      }
+    });
+  };
+
+  var isBottomReached = function() {
+    var GAP = 200;
+    var bodyPosition = document.body.getBoundingClientRect();
+    return bodyPosition.bottom - window.innerHeight - GAP <= 0;
+  };
+
+  var isNextPageAvailable = function(loadedPictures, page, pageSize) {
+    return page < Math.ceil(loadedPictures.length / pageSize);
+  };
+
+  var optimizedScroll = throttle(function() {
+    if(isBottomReached() && isNextPageAvailable(pictures, pageNumber, PAGE_SIZE)) {
+      pageNumber++;
+      renderPictures(filteredPictures, pageNumber, false);
     }
+  }, 100);
+
+  var setScrollEnabled = function() {
+    window.addEventListener('scroll', optimizedScroll);
   };
 
   getPictures(function(loadedPictures) {
     pictures = loadedPictures;
-    setFiltersEnabled(true);
+    setFiltersEnabled();
     setFilterEnabled(DEFAULT_FILTER);
+    setScrollEnabled();
   });
 
   filtersContainer.classList.remove('hidden');
